@@ -3,10 +3,10 @@ import { useState, useCallback, useRef, useEffect } from "react";
 
 /* ─── CONSTANTS ─── */
 const CARE_STEPS = [
-  { key: "consider", label: "Consider", icon: "🔍", color: "#3b82f6", description: "What is the task? Who is the audience? What tools are available?" },
-  { key: "analyze", label: "Analyze", icon: "📊", color: "#8b5cf6", description: "What information do you need? What are the constraints? What format works best?" },
-  { key: "reflect", label: "Reflect", icon: "💭", color: "#f59e0b", description: "Is this the right approach? What could go wrong? What assumptions am I making?" },
-  { key: "evaluate", label: "Evaluate", icon: "✅", color: "#10b981", description: "Does the output meet the need? What would I improve? How can I verify accuracy?" },
+  { key: "consider", label: "Consider", icon: "🔍", color: "#60a5fa", description: "What is the task? Who is the audience? What tools are available?" },
+  { key: "analyze", label: "Analyze", icon: "📊", color: "#a78bfa", description: "What information do you need? What are the constraints? What format works best?" },
+  { key: "reflect", label: "Reflect", icon: "💭", color: "#fbbf24", description: "Is this the right approach? What could go wrong? What assumptions am I making?" },
+  { key: "evaluate", label: "Evaluate", icon: "✅", color: "#34d399", description: "Does the output meet the need? What would I improve? How can I verify accuracy?" },
 ];
 
 const CRAFT_FIELDS = [
@@ -28,90 +28,245 @@ const PROMPT_CATEGORIES = [
 
 const ASSESSMENT_DIMENSIONS = [
   {
-    key: "leadership", label: "Leadership & Vision", icon: "👑", color: "#3b82f6",
-    questions: ["Does your institution have a formal AI strategy or roadmap?", "Is there executive-level sponsorship for AI initiatives?", "Are AI goals aligned with your institution's strategic plan?", "Is there a designated AI champion or committee?"],
+    key: "leadership",
+    label: "Leadership & Vision",
+    icon: "👑",
+    color: "#60a5fa",
+    questions: [
+      "Does your institution have a formal AI strategy or roadmap?",
+      "Is there executive-level sponsorship for AI initiatives?",
+      "Are AI goals aligned with your institution's strategic plan?",
+      "Is there a designated AI champion or committee?",
+    ],
   },
   {
-    key: "infrastructure", label: "Technology Infrastructure", icon: "🖥️", color: "#8b5cf6",
-    questions: ["Do you have reliable high-speed internet across the institution?", "Are your core systems (LMS, HRIS, CRM) cloud-based and API-enabled?", "Do you have data storage and processing capacity for AI workloads?", "Is there a centralized IT support team capable of managing AI tools?"],
+    key: "infrastructure",
+    label: "Technology Infrastructure",
+    icon: "🖥️",
+    color: "#a78bfa",
+    questions: [
+      "Do you have reliable high-speed internet across the institution?",
+      "Are your core systems (LMS, HRIS, CRM) cloud-based and API-enabled?",
+      "Do you have data storage and processing capacity for AI workloads?",
+      "Is there a centralized IT support team capable of managing AI tools?",
+    ],
   },
   {
-    key: "data", label: "Data Readiness", icon: "📊", color: "#06b6d4",
-    questions: ["Is your institutional data organized, clean, and accessible?", "Do you have data governance policies in place?", "Are there data privacy and security protocols aligned with regulations?", "Can your systems share data across departments effectively?"],
+    key: "data",
+    label: "Data Readiness",
+    icon: "📊",
+    color: "#22d3ee",
+    questions: [
+      "Is your institutional data organized, clean, and accessible?",
+      "Do you have data governance policies in place?",
+      "Are there data privacy and security protocols aligned with regulations?",
+      "Can your systems share data across departments effectively?",
+    ],
   },
   {
-    key: "people", label: "People & Skills", icon: "👥", color: "#10b981",
-    questions: ["Do staff and faculty have basic digital literacy skills?", "Have any staff received AI-specific training?", "Is there a culture of innovation and willingness to adopt new tools?", "Are there mechanisms for ongoing professional development?"],
+    key: "people",
+    label: "People & Skills",
+    icon: "👥",
+    color: "#34d399",
+    questions: [
+      "Do staff and faculty have basic digital literacy skills?",
+      "Have any staff received AI-specific training?",
+      "Is there a culture of innovation and willingness to adopt new tools?",
+      "Are there mechanisms for ongoing professional development?",
+    ],
   },
   {
-    key: "ethics", label: "Ethics & Governance", icon: "⚖️", color: "#f59e0b",
-    questions: ["Does your institution have an AI ethics policy or guidelines?", "Are there processes to evaluate AI bias and fairness?", "Is there transparency about how AI tools use institutional data?", "Do you have an AI acceptable use policy for staff and students?"],
+    key: "ethics",
+    label: "Ethics & Governance",
+    icon: "⚖️",
+    color: "#fbbf24",
+    questions: [
+      "Does your institution have an AI ethics policy or guidelines?",
+      "Are there processes to evaluate AI bias and fairness?",
+      "Is there transparency about how AI tools use institutional data?",
+      "Do you have an AI acceptable use policy for staff and students?",
+    ],
   },
   {
-    key: "budget", label: "Budget & Resources", icon: "💰", color: "#f43f5e",
-    questions: ["Is there a dedicated budget for AI tools and implementation?", "Are there funds allocated for AI-related training?", "Has a cost-benefit analysis been done for AI adoption?", "Are there plans for sustainable long-term AI investment?"],
+    key: "budget",
+    label: "Budget & Resources",
+    icon: "💰",
+    color: "#fb7185",
+    questions: [
+      "Is there a dedicated budget for AI tools and implementation?",
+      "Are there funds allocated for AI-related training?",
+      "Has a cost-benefit analysis been done for AI adoption?",
+      "Are there plans for sustainable long-term AI investment?",
+    ],
   },
   {
-    key: "processes", label: "Processes & Workflows", icon: "⚙️", color: "#ec4899",
-    questions: ["Have you identified processes that could benefit from AI automation?", "Are current workflows documented and standardized?", "Is there a pilot or testing framework for new technologies?", "Do you have change management processes for technology adoption?"],
+    key: "processes",
+    label: "Processes & Workflows",
+    icon: "⚙️",
+    color: "#f472b6",
+    questions: [
+      "Have you identified processes that could benefit from AI automation?",
+      "Are current workflows documented and standardized?",
+      "Is there a pilot or testing framework for new technologies?",
+      "Do you have change management processes for technology adoption?",
+    ],
   },
   {
-    key: "ecosystem", label: "Partnerships & Ecosystem", icon: "🤝", color: "#14b8a6",
-    questions: ["Do you have partnerships with AI vendors or consultants?", "Are there collaborations with other institutions on AI initiatives?", "Do you engage with industry for AI best practices?", "Are there connections to regional or national AI strategies?"],
+    key: "ecosystem",
+    label: "Partnerships & Ecosystem",
+    icon: "🤝",
+    color: "#2dd4bf",
+    questions: [
+      "Do you have partnerships with AI vendors or consultants?",
+      "Are there collaborations with other institutions on AI initiatives?",
+      "Do you engage with industry for AI best practices?",
+      "Are there connections to regional or national AI strategies?",
+    ],
   },
 ];
 
 const SCORE_OPTIONS = [
-  { value: 1, label: "Not at all", color: "#f43f5e" },
-  { value: 2, label: "Beginning", color: "#f97316" },
-  { value: 3, label: "Developing", color: "#f59e0b" },
-  { value: 4, label: "Established", color: "#84cc16" },
-  { value: 5, label: "Advanced", color: "#10b981" },
+  { value: 1, label: "Not at all", color: "#fb7185" },
+  { value: 2, label: "Beginning", color: "#fb923c" },
+  { value: 3, label: "Developing", color: "#fbbf24" },
+  { value: 4, label: "Established", color: "#a3e635" },
+  { value: 5, label: "Advanced", color: "#34d399" },
 ];
 
 function getReadinessLevel(score) {
-  if (score >= 4.5) return { level: "AI Ready", color: "#10b981", emoji: "🚀", desc: "Your institution is well-positioned for AI adoption. Focus on optimization and innovation." };
-  if (score >= 3.5) return { level: "Progressing", color: "#84cc16", emoji: "📈", desc: "Strong foundation with room to grow. Prioritize your weakest dimensions." };
-  if (score >= 2.5) return { level: "Developing", color: "#f59e0b", emoji: "🔨", desc: "Building blocks are forming. Focus on infrastructure, skills, and governance." };
-  if (score >= 1.5) return { level: "Emerging", color: "#f97316", emoji: "🌱", desc: "Early stages of AI readiness. Start with leadership buy-in and foundational infrastructure." };
-  return { level: "Beginning", color: "#f43f5e", emoji: "🏁", desc: "Just starting the journey. Begin with awareness-building and strategic planning." };
+  if (score >= 4.5) return { level: "AI Ready", color: "#34d399", emoji: "🚀", desc: "Your institution is well-positioned for AI adoption. Focus on optimization and innovation." };
+  if (score >= 3.5) return { level: "Progressing", color: "#a3e635", emoji: "📈", desc: "Strong foundation with room to grow. Prioritize your weakest dimensions." };
+  if (score >= 2.5) return { level: "Developing", color: "#fbbf24", emoji: "🔨", desc: "Building blocks are forming. Focus on infrastructure, skills, and governance." };
+  if (score >= 1.5) return { level: "Emerging", color: "#fb923c", emoji: "🌱", desc: "Early stages of AI readiness. Start with leadership buy-in and foundational infrastructure." };
+  return { level: "Beginning", color: "#fb7185", emoji: "🏁", desc: "Just starting the journey. Begin with awareness-building and strategic planning." };
 }
 
 /* ─── STYLES ─── */
 const s = {
   app: { minHeight: "100vh", background: "#0f172a" },
-  header: { background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)", borderBottom: "1px solid #334155", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" },
+  skipLink: { position: "absolute", top: -40, left: 0, background: "#3b82f6", color: "white", padding: "8px 16px", zIndex: 200, fontSize: 14, fontWeight: 600, textDecoration: "none", borderRadius: "0 0 8px 0", transition: "top 0.2s" },
+  skipLinkFocus: { top: 0 },
+  header: { background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)", borderBottom: "1px solid #475569", padding: "20px 24px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" },
   headerInner: { maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 },
   logo: { display: "flex", alignItems: "center", gap: 12 },
   logoIcon: { width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "white" },
-  logoText: { fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#f1f5f9" },
-  logoSub: { fontSize: 12, color: "#94a3b8", letterSpacing: 1.5, textTransform: "uppercase", marginTop: -2 },
-  nav: { display: "flex", gap: 4, background: "#0f172a", borderRadius: 12, padding: 4, border: "1px solid #334155" },
-  navBtn: (active) => ({ padding: "10px 20px", borderRadius: 10, border: "none", background: active ? "#3b82f6" : "transparent", color: active ? "white" : "#94a3b8", fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.2s", fontFamily: "Inter, sans-serif" }),
+  logoText: { fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#f8fafc" },
+  logoSub: { fontSize: 12, color: "#cbd5e1", letterSpacing: 1.5, textTransform: "uppercase", marginTop: -2 },
+  nav: { display: "flex", gap: 4, background: "#0f172a", borderRadius: 12, padding: 4, border: "1px solid #475569" },
+  navBtn: (active) => ({ padding: "10px 20px", borderRadius: 10, border: "none", background: active ? "#3b82f6" : "transparent", color: active ? "white" : "#cbd5e1", fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.2s", fontFamily: "Inter, sans-serif" }),
   main: { maxWidth: 1200, margin: "0 auto", padding: "32px 24px 100px" },
   hero: { textAlign: "center", marginBottom: 48 },
-  heroTitle: { fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 700, color: "#f1f5f9", marginBottom: 12, lineHeight: 1.2 },
-  heroSub: { fontSize: 18, color: "#94a3b8", maxWidth: 600, margin: "0 auto" },
-  card: { background: "#1e293b", borderRadius: 16, border: "1px solid #334155", padding: 24, marginBottom: 20, transition: "all 0.2s" },
-  cardTitle: { fontSize: 20, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 },
-  cardDesc: { fontSize: 14, color: "#94a3b8", lineHeight: 1.6 },
+  heroTitle: { fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 700, color: "#f8fafc", marginBottom: 12, lineHeight: 1.2 },
+  heroSub: { fontSize: 18, color: "#cbd5e1", maxWidth: 600, margin: "0 auto" },
+  card: { background: "#1e293b", borderRadius: 16, border: "1px solid #475569", padding: 24, marginBottom: 20, transition: "all 0.2s" },
+  cardTitle: { fontSize: 20, fontWeight: 700, color: "#f8fafc", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 },
+  cardDesc: { fontSize: 14, color: "#cbd5e1", lineHeight: 1.6 },
   label: { display: "block", fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 6 },
-  input: { width: "100%", padding: "12px 16px", borderRadius: 10, border: "1px solid #334155", background: "#0f172a", color: "#f1f5f9", fontSize: 15, fontFamily: "Inter, sans-serif", outline: "none", transition: "border-color 0.2s", lineHeight: 1.5 },
-  textarea: { width: "100%", padding: "12px 16px", borderRadius: 10, border: "1px solid #334155", background: "#0f172a", color: "#f1f5f9", fontSize: 15, fontFamily: "Inter, sans-serif", outline: "none", resize: "vertical", minHeight: 100, lineHeight: 1.5 },
-  hint: { fontSize: 12, color: "#64748b", marginTop: 4, fontStyle: "italic" },
+  input: { width: "100%", padding: "12px 16px", borderRadius: 10, border: "2px solid #475569", background: "#0f172a", color: "#f1f5f9", fontSize: 15, fontFamily: "Inter, sans-serif", outline: "none", transition: "border-color 0.2s, box-shadow 0.2s", lineHeight: 1.5 },
+  textarea: { width: "100%", padding: "12px 16px", borderRadius: 10, border: "2px solid #475569", background: "#0f172a", color: "#f1f5f9", fontSize: 15, fontFamily: "Inter, sans-serif", outline: "none", resize: "vertical", minHeight: 100, lineHeight: 1.5, transition: "border-color 0.2s, box-shadow 0.2s" },
+  hint: { fontSize: 13, color: "#94a3b8", marginTop: 4, fontStyle: "italic" },
   btnPrimary: { padding: "14px 28px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" },
-  btnSecondary: { padding: "12px 24px", borderRadius: 10, border: "1px solid #334155", background: "transparent", color: "#94a3b8", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" },
+  btnSecondary: { padding: "12px 24px", borderRadius: 10, border: "2px solid #475569", background: "transparent", color: "#cbd5e1", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" },
   btnSuccess: { padding: "14px 28px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" },
   grid2: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 },
   grid3: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 },
-  tag: (color) => ({ display: "inline-block", padding: "4px 12px", borderRadius: 20, background: color + "20", color: color, fontSize: 12, fontWeight: 600 }),
-  progressBar: (pct, color) => ({ height: 8, borderRadius: 4, background: "#0f172a", overflow: "hidden", position: "relative" }),
-  progressFill: (pct, color) => ({ height: "100%", width: pct + "%", borderRadius: 4, background: color, transition: "width 0.5s ease" }),
-  badge: (color) => ({ width: 48, height: 48, borderRadius: 12, background: color + "20", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }),
-  outputBox: { background: "#0f172a", borderRadius: 12, border: "1px solid #334155", padding: 20, fontFamily: "monospace", fontSize: 14, lineHeight: 1.8, color: "#e2e8f0", whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: 500, overflowY: "auto" },
-  copyBtn: { position: "absolute", top: 12, right: 12, padding: "8px 16px", borderRadius: 8, border: "1px solid #334155", background: "#1e293b", color: "#94a3b8", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif" },
+  tag: (color) => ({ display: "inline-block", padding: "4px 12px", borderRadius: 20, background: color + "25", color: color, fontSize: 12, fontWeight: 700, border: "1px solid " + color + "40" }),
+  progressBar: () => ({ height: 10, borderRadius: 5, background: "#1e293b", overflow: "hidden", position: "relative", border: "1px solid #475569" }),
+  progressFill: (pct, color) => ({ height: "100%", width: pct + "%", borderRadius: 5, background: color, transition: "width 0.5s ease" }),
+  badge: (color) => ({ width: 48, height: 48, borderRadius: 12, background: color + "25", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, border: "1px solid " + color + "40" }),
+  outputBox: { background: "#0f172a", borderRadius: 12, border: "2px solid #475569", padding: 20, fontFamily: "monospace", fontSize: 14, lineHeight: 1.8, color: "#e2e8f0", whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: 500, overflowY: "auto" },
+  copyBtn: { position: "absolute", top: 12, right: 12, padding: "8px 16px", borderRadius: 8, border: "2px solid #475569", background: "#1e293b", color: "#cbd5e1", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif" },
 };
 
+/* ─── FOCUS STYLES CSS (injected) ─── */
+const ACCESSIBILITY_CSS = `  /* Skip link */
+  .skip-link:focus { top: 0 !important; }
+
+  /* Focus visible for all interactive elements */
+  *:focus-visible {
+    outline: 3px solid #60a5fa !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.25) !important;
+  }
+
+  /* Remove default outline only when not focus-visible */
+  *:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Input/textarea focus */
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    border-color: #60a5fa !important;
+    outline: 3px solid #60a5fa !important;
+    outline-offset: -1px !important;
+  }
+
+  /* Button hover enhancement */
+  button:hover:not(:disabled) {
+    filter: brightness(1.15);
+  }
+
+  /* Disabled button styling */
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    filter: grayscale(0.3);
+  }
+
+  /* Placeholder contrast */
+  ::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: rgba(96, 165, 250, 0.35);
+    color: #f8fafc;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (forced-colors: active) {
+    button, input, textarea, select {
+      border: 2px solid ButtonText !important;
+    }
+    button:focus-visible {
+      outline: 3px solid Highlight !important;
+    }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white !important; color: black !important; }
+    button, nav, .skip-link { display: none !important; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-text { display: none; }
+  }
+
+  /* Scrollbar for progress track */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+`;
 /* ─── PROMPT BUILDER ─── */
 function PromptBuilder() {
   const [category, setCategory] = useState(null);
@@ -132,13 +287,16 @@ function PromptBuilder() {
     if (craftInputs.action) parts.push("**Task:** " + craftInputs.action);
     if (craftInputs.format) parts.push("**Format:** " + craftInputs.format);
     if (craftInputs.threshold) parts.push("**Quality Standards:** " + craftInputs.threshold);
+
     let prompt = parts.join("\n\n");
+
     if (careNotes.consider || careNotes.analyze || careNotes.reflect) {
       prompt += "\n\n---\n**Additional Notes:**";
       if (careNotes.consider) prompt += "\n- Considerations: " + careNotes.consider;
       if (careNotes.analyze) prompt += "\n- Analysis: " + careNotes.analyze;
       if (careNotes.reflect) prompt += "\n- Reflections: " + careNotes.reflect;
     }
+
     setGenerated(prompt);
     setTimeout(() => outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   };
@@ -148,7 +306,7 @@ function PromptBuilder() {
       await navigator.clipboard.writeText(generated);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (e) { /* fallback */ }
+    } catch { /* fallback */ }
   };
 
   const resetAll = () => {
@@ -160,6 +318,13 @@ function PromptBuilder() {
 
   const filledCount = CRAFT_FIELDS.filter((f) => craftInputs[f.key].trim()).length;
 
+  const handleCategoryKeyDown = (e, catId) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setCategory(catId);
+    }
+  };
+
   return (
     <div>
       <div style={s.hero}>
@@ -168,83 +333,142 @@ function PromptBuilder() {
       </div>
 
       {/* Category Selection */}
-      <div style={s.card}>
-        <h3 style={s.cardTitle}>📂 Choose Your Category</h3>
+      <section style={s.card} aria-labelledby="category-heading">
+        <h3 id="category-heading" style={s.cardTitle}>📂 Choose Your Category</h3>
         <p style={{ ...s.cardDesc, marginBottom: 16 }}>Select the domain for your prompt to get contextual guidance.</p>
-        <div style={s.grid3}>
+        <div style={s.grid3} role="radiogroup" aria-label="Prompt category">
           {PROMPT_CATEGORIES.map((cat) => (
-            <div key={cat.id} onClick={() => setCategory(cat.id)} style={{ padding: 16, borderRadius: 12, border: "2px solid " + (category === cat.id ? "#3b82f6" : "#334155"), background: category === cat.id ? "rgba(59,130,246,0.1)" : "#0f172a", cursor: "pointer", transition: "all 0.2s" }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>{cat.icon}</div>
-              <div style={{ fontWeight: 700, color: "#f1f5f9", fontSize: 14, marginBottom: 4 }}>{cat.label}</div>
-              <div style={{ fontSize: 12, color: "#64748b" }}>{cat.examples.join(" • ")}</div>
+            <div
+              key={cat.id}
+              role="radio"
+              aria-checked={category === cat.id}
+              tabIndex={0}
+              onClick={() => setCategory(cat.id)}
+              onKeyDown={(e) => handleCategoryKeyDown(e, cat.id)}
+              style={{
+                padding: 16,
+                borderRadius: 12,
+                border: "2px solid " + (category === cat.id ? "#60a5fa" : "#475569"),
+                background: category === cat.id ? "rgba(59,130,246,0.15)" : "#0f172a",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              <div style={{ fontSize: 28, marginBottom: 8 }} aria-hidden="true">{cat.icon}</div>
+              <div style={{ fontWeight: 700, color: "#f8fafc", fontSize: 14, marginBottom: 4 }}>{cat.label}</div>
+              <div style={{ fontSize: 13, color: "#94a3b8" }}>{cat.examples.join(" • ")}</div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* CRAFT Builder */}
-      <div style={s.card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h3 style={s.cardTitle}>✨ CRAFT Your Prompt <span style={s.tag("#3b82f6")}>{filledCount}/5 fields</span></h3>
-          <button onClick={resetAll} style={s.btnSecondary}>Reset All</button>
+      <section style={s.card} aria-labelledby="craft-heading">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+          <h3 id="craft-heading" style={s.cardTitle}>
+            ✨ CRAFT Your Prompt
+            <span style={s.tag("#60a5fa")} aria-label={filledCount + " of 5 fields filled"}>{filledCount}/5 fields</span>
+          </h3>
+          <button onClick={resetAll} style={s.btnSecondary} aria-label="Reset all prompt fields">Reset All</button>
         </div>
-        {CRAFT_FIELDS.map((field, i) => (
-          <div key={field.key} style={{ marginBottom: 20 }}>
-            <label style={s.label}>{field.icon} {field.label} <span style={{ color: "#64748b", fontWeight: 400 }}> — {["Set the scene", "Define the expert", "Specify the task", "Structure the output", "Set quality bars"][i]}</span></label>
-            <textarea style={s.textarea} placeholder={field.placeholder} value={craftInputs[field.key]} onChange={(e) => updateCraft(field.key, e.target.value)} rows={3} />
-            <p style={s.hint}>💡 {field.hint}</p>
-          </div>
-        ))}
-      </div>
 
-      {/* CARE Thinking */}
-      <div style={s.card}>
-        <div onClick={() => setShowCare(!showCare)} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}>
-          <h3 style={s.cardTitle}>🧠 CARE Thinking Notes <span style={{ fontSize: 13, color: "#64748b", fontWeight: 400 }}>(Optional)</span></h3>
-          <span style={{ fontSize: 20, color: "#64748b", transition: "transform 0.2s", transform: showCare ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
-        </div>
+        {CRAFT_FIELDS.map((field, i) => {
+          const fieldId = "craft-" + field.key;
+          const hintId = "craft-" + field.key + "-hint";
+          return (
+            <div key={field.key} style={{ marginBottom: 20 }}>
+              <label htmlFor={fieldId} style={s.label}>
+                <span aria-hidden="true">{field.icon}</span> {field.label}
+                <span style={{ color: "#94a3b8", fontWeight: 400 }}> — {["Set the scene", "Define the expert", "Specify the task", "Structure the output", "Set quality bars"][i]}</span>
+              </label>
+              <textarea
+                id={fieldId}
+                style={s.textarea}
+                placeholder={field.placeholder}
+                value={craftInputs[field.key]}
+                onChange={(e) => updateCraft(field.key, e.target.value)}
+                rows={3}
+                aria-describedby={hintId}
+              />
+              <p id={hintId} style={s.hint}>💡 {field.hint}</p>
+            </div>
+          );
+        })}
+      </section>
+
+      {/* CARE Thinking (collapsible) */}
+      <section style={s.card} aria-labelledby="care-heading">
+        <button
+          onClick={() => setShowCare(!showCare)}
+          aria-expanded={showCare}
+          aria-controls="care-panel"
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", width: "100%", background: "none", border: "none", padding: 0, textAlign: "left" }}
+        >
+          <h3 id="care-heading" style={s.cardTitle}>🧠 CARE Thinking Notes <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 400 }}>(Optional)</span></h3>
+          <span style={{ fontSize: 20, color: "#94a3b8", transition: "transform 0.2s", transform: showCare ? "rotate(180deg)" : "rotate(0deg)" }} aria-hidden="true">▼</span>
+        </button>
         <p style={{ ...s.cardDesc, marginTop: 4 }}>Use CARE to think critically before, during, and after prompt creation.</p>
+
         {showCare && (
-          <div style={{ marginTop: 20 }}>
+          <div id="care-panel" style={{ marginTop: 20 }}>
             <div style={s.grid2}>
-              {CARE_STEPS.map((step) => (
-                <div key={step.key} style={{ padding: 16, borderRadius: 12, border: "1px solid " + step.color + "30", background: step.color + "08" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <span style={s.badge(step.color)}>{step.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 700, color: step.color, fontSize: 14 }}>{step.label}</div>
-                      <div style={{ fontSize: 12, color: "#94a3b8" }}>{step.description}</div>
+              {CARE_STEPS.map((step) => {
+                const noteId = "care-" + step.key;
+                return (
+                  <div key={step.key} style={{ padding: 16, borderRadius: 12, border: "1px solid " + step.color + "40", background: step.color + "10" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <span style={s.badge(step.color)} aria-hidden="true">{step.icon}</span>
+                      <div>
+                        <div style={{ fontWeight: 700, color: step.color, fontSize: 14 }}>{step.label}</div>
+                        <div style={{ fontSize: 13, color: "#cbd5e1" }}>{step.description}</div>
+                      </div>
                     </div>
+                    <label htmlFor={noteId} className="sr-only">{step.label} notes</label>
+                    <textarea
+                      id={noteId}
+                      style={{ ...s.textarea, minHeight: 70, borderColor: step.color + "40" }}
+                      placeholder={"Your " + step.label.toLowerCase() + " notes..."}
+                      value={careNotes[step.key]}
+                      onChange={(e) => updateCare(step.key, e.target.value)}
+                      rows={2}
+                    />
                   </div>
-                  <textarea style={{ ...s.textarea, minHeight: 70, borderColor: step.color + "30" }} placeholder={"Your " + step.label.toLowerCase() + " notes..."} value={careNotes[step.key]} onChange={(e) => updateCare(step.key, e.target.value)} rows={2} />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Generate */}
       <div style={{ textAlign: "center", margin: "32px 0" }}>
-        <button onClick={generatePrompt} style={{ ...s.btnPrimary, fontSize: 18, padding: "16px 48px" }} disabled={filledCount === 0}>🚀 Generate Prompt</button>
+        <button
+          onClick={generatePrompt}
+          style={{ ...s.btnPrimary, fontSize: 18, padding: "16px 48px", opacity: filledCount === 0 ? 0.5 : 1 }}
+          disabled={filledCount === 0}
+          aria-label={filledCount === 0 ? "Fill at least one CRAFT field to generate a prompt" : "Generate your CRAFT prompt"}
+        >
+          🚀 Generate Prompt
+        </button>
       </div>
 
       {/* Output */}
       {generated && (
-        <div ref={outputRef} style={{ ...s.card, position: "relative", borderColor: "#3b82f6" }}>
+        <div ref={outputRef} style={{ ...s.card, position: "relative", borderColor: "#60a5fa" }} aria-live="polite" role="region" aria-label="Generated prompt output">
           <h3 style={{ ...s.cardTitle, marginBottom: 16 }}>📝 Your Generated Prompt</h3>
-          <button onClick={copyToClipboard} style={s.copyBtn}>{copied ? "✅ Copied!" : "📋 Copy"}</button>
-          <div style={s.outputBox}>{generated}</div>
-          <div style={{ marginTop: 16, padding: 16, borderRadius: 10, background: "#10b98115", border: "1px solid #10b98130" }}>
-            <p style={{ fontSize: 14, color: "#10b981", fontWeight: 600 }}>✅ CARE Evaluation Checklist</p>
-            <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>After getting your AI response, evaluate it: Is it accurate? Does it meet your needs? What would you change? Does it reflect any biases?</p>
+          <button onClick={copyToClipboard} style={s.copyBtn} aria-label={copied ? "Prompt copied to clipboard" : "Copy prompt to clipboard"}>
+            {copied ? "✅ Copied!" : "📋 Copy"}
+          </button>
+          <div style={s.outputBox} role="textbox" aria-readonly="true" aria-label="Generated prompt text" tabIndex={0}>{generated}</div>
+          <div style={{ marginTop: 16, padding: 16, borderRadius: 10, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)" }}>
+            <p style={{ fontSize: 14, color: "#34d399", fontWeight: 600 }}>✅ CARE Evaluation Checklist</p>
+            <p style={{ fontSize: 14, color: "#cbd5e1", marginTop: 4 }}>After getting your AI response, evaluate it: Is it accurate? Does it meet your needs? What would you change? Does it reflect any biases?</p>
           </div>
         </div>
       )}
     </div>
   );
 }
-
 /* ─── AI READINESS ASSESSMENT ─── */
 function ReadinessAssessment() {
   const [institutionName, setInstitutionName] = useState("");
@@ -252,10 +476,13 @@ function ReadinessAssessment() {
   const [scores, setScores] = useState({});
   const [currentDim, setCurrentDim] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [viewMode, setViewMode] = useState("assessment");
+  const [viewMode, setViewMode] = useState("assessment"); // assessment | results
 
   const setScore = (dimKey, qIdx, value) => {
-    setScores((p) => ({ ...p, [dimKey + "_" + qIdx]: value }));
+    setScores((p) => ({
+      ...p,
+      [dimKey + "_" + qIdx]: value,
+    }));
   };
 
   const getDimScore = (dimKey) => {
@@ -283,8 +510,17 @@ function ReadinessAssessment() {
     return { weakest, strongest };
   };
 
-  const generateReport = () => { setShowResults(true); setViewMode("results"); };
-  const resetAssessment = () => { setScores({}); setCurrentDim(0); setShowResults(false); setViewMode("assessment"); };
+  const generateReport = () => {
+    setShowResults(true);
+    setViewMode("results");
+  };
+
+  const resetAssessment = () => {
+    setScores({});
+    setCurrentDim(0);
+    setShowResults(false);
+    setViewMode("assessment");
+  };
 
   const overall = getOverallScore();
   const readiness = getReadinessLevel(overall);
@@ -292,23 +528,25 @@ function ReadinessAssessment() {
 
   if (viewMode === "results" && showResults) {
     return (
-      <div>
+      <div role="region" aria-label="AI Readiness Assessment Results">
         <div style={s.hero}>
           <h2 style={s.heroTitle}>📊 AI Readiness Report</h2>
           <p style={s.heroSub}>{institutionName || "Your Institution"} {sector ? "• " + sector : ""}</p>
         </div>
 
         {/* Overall Score */}
-        <div style={{ ...s.card, textAlign: "center", borderColor: readiness.color, background: "linear-gradient(135deg, " + readiness.color + "08, " + readiness.color + "04)" }}>
-          <div style={{ fontSize: 64, marginBottom: 8 }}>{readiness.emoji}</div>
-          <div style={{ fontSize: 48, fontWeight: 800, color: readiness.color }}>{overall.toFixed(1)}<span style={{ fontSize: 24, color: "#64748b" }}>/5.0</span></div>
+        <section style={{ ...s.card, textAlign: "center", borderColor: readiness.color, background: "linear-gradient(135deg, " + readiness.color + "10, " + readiness.color + "05)" }} aria-label="Overall readiness score">
+          <div style={{ fontSize: 64, marginBottom: 8 }} aria-hidden="true">{readiness.emoji}</div>
+          <div style={{ fontSize: 48, fontWeight: 800, color: readiness.color }} aria-label={"Overall score: " + overall.toFixed(1) + " out of 5"}>
+            {overall.toFixed(1)}<span style={{ fontSize: 24, color: "#94a3b8" }}>/5.0</span>
+          </div>
           <div style={{ fontSize: 24, fontWeight: 700, color: readiness.color, marginBottom: 8 }}>{readiness.level}</div>
-          <p style={{ fontSize: 16, color: "#94a3b8", maxWidth: 500, margin: "0 auto" }}>{readiness.desc}</p>
-        </div>
+          <p style={{ fontSize: 16, color: "#cbd5e1", maxWidth: 500, margin: "0 auto" }}>{readiness.desc}</p>
+        </section>
 
         {/* Dimension Scores */}
-        <div style={s.card}>
-          <h3 style={s.cardTitle}>📈 Dimension Scores</h3>
+        <section style={s.card} aria-labelledby="dim-scores-heading">
+          <h3 id="dim-scores-heading" style={s.cardTitle}>📈 Dimension Scores</h3>
           <div style={{ marginTop: 16 }}>
             {ASSESSMENT_DIMENSIONS.map((dim) => {
               const dimScore = getDimScore(dim.key);
@@ -317,7 +555,7 @@ function ReadinessAssessment() {
                 <div key={dim.key} style={{ marginBottom: 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span>{dim.icon}</span>
+                      <span aria-hidden="true">{dim.icon}</span>
                       <span style={{ fontWeight: 600, fontSize: 14, color: "#e2e8f0" }}>{dim.label}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -325,64 +563,66 @@ function ReadinessAssessment() {
                       <span style={{ fontWeight: 700, color: dimLevel.color }}>{dimScore.toFixed(1)}</span>
                     </div>
                   </div>
-                  <div style={s.progressBar(0, "")}>
+                  <div style={s.progressBar()} role="progressbar" aria-valuenow={Math.round(dimScore * 20)} aria-valuemin={0} aria-valuemax={100} aria-label={dim.label + ": " + dimScore.toFixed(1) + " out of 5"}>
                     <div style={s.progressFill((dimScore / 5) * 100, dim.color)} />
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        </section>
 
         {/* Recommendations */}
         <div style={s.grid2}>
-          <div style={{ ...s.card, borderColor: "#f43f5e30" }}>
-            <h3 style={{ ...s.cardTitle, color: "#f43f5e" }}>🎯 Priority Areas</h3>
+          <section style={{ ...s.card, borderColor: "rgba(251,113,133,0.25)" }} aria-labelledby="priority-heading">
+            <h3 id="priority-heading" style={{ ...s.cardTitle, color: "#fb7185" }}>🎯 Priority Areas</h3>
             <p style={{ ...s.cardDesc, marginBottom: 12 }}>Focus your efforts here for maximum impact.</p>
             {weakest.length > 0 ? weakest.map((d) => (
               <div key={d.key} style={{ padding: 12, borderRadius: 10, background: "#0f172a", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={s.badge(d.color)}>{d.icon}</span>
+                <span style={s.badge(d.color)} aria-hidden="true">{d.icon}</span>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14, color: "#e2e8f0" }}>{d.label}</div>
-                  <div style={{ fontSize: 13, color: "#f43f5e" }}>Score: {d.score.toFixed(1)} — Needs attention</div>
+                  <div style={{ fontSize: 13, color: "#fb7185" }}>Score: {d.score.toFixed(1)} — Needs attention</div>
                 </div>
               </div>
-            )) : <p style={{ color: "#94a3b8", fontSize: 14 }}>All dimensions scoring above 3.5 — great work!</p>}
-          </div>
+            )) : <p style={{ color: "#cbd5e1", fontSize: 14 }}>All dimensions scoring above 3.5 — great work!</p>}
+          </section>
 
-          <div style={{ ...s.card, borderColor: "#10b98130" }}>
-            <h3 style={{ ...s.cardTitle, color: "#10b981" }}>💪 Strengths</h3>
+          <section style={{ ...s.card, borderColor: "rgba(52,211,153,0.25)" }} aria-labelledby="strengths-heading">
+            <h3 id="strengths-heading" style={{ ...s.cardTitle, color: "#34d399" }}>💪 Strengths</h3>
             <p style={{ ...s.cardDesc, marginBottom: 12 }}>Build on these existing capabilities.</p>
             {strongest.length > 0 ? strongest.map((d) => (
               <div key={d.key} style={{ padding: 12, borderRadius: 10, background: "#0f172a", marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={s.badge(d.color)}>{d.icon}</span>
+                <span style={s.badge(d.color)} aria-hidden="true">{d.icon}</span>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14, color: "#e2e8f0" }}>{d.label}</div>
-                  <div style={{ fontSize: 13, color: "#10b981" }}>Score: {d.score.toFixed(1)} — Strong</div>
+                  <div style={{ fontSize: 13, color: "#34d399" }}>Score: {d.score.toFixed(1)} — Strong</div>
                 </div>
               </div>
-            )) : <p style={{ color: "#94a3b8", fontSize: 14 }}>Complete more of the assessment to see strengths.</p>}
-          </div>
+            )) : <p style={{ color: "#cbd5e1", fontSize: 14 }}>Complete more of the assessment to see strengths.</p>}
+          </section>
         </div>
 
         {/* Action Plan */}
-        <div style={s.card}>
-          <h3 style={s.cardTitle}>🗺️ Recommended Next Steps</h3>
+        <section style={s.card} aria-labelledby="action-heading">
+          <h3 id="action-heading" style={s.cardTitle}>🗺️ Recommended Next Steps</h3>
           <div style={{ marginTop: 12 }}>
             {[
               { phase: "Quick Wins (0-3 months)", items: ["Establish an AI governance committee", "Create an AI acceptable use policy", "Audit current tool ecosystem for AI capabilities"] },
               { phase: "Foundation Building (3-6 months)", items: ["Launch AI literacy training for all staff", "Identify 2-3 pilot AI projects", "Develop data governance framework"] },
               { phase: "Scale & Optimize (6-12 months)", items: ["Expand successful pilots institution-wide", "Build strategic vendor partnerships", "Create ongoing AI skills development program"] },
             ].map((phase, i) => (
-              <div key={i} style={{ padding: 16, borderRadius: 12, background: "#0f172a", marginBottom: 12, borderLeft: "3px solid " + ["#3b82f6", "#8b5cf6", "#10b981"][i] }}>
-                <div style={{ fontWeight: 700, color: ["#3b82f6", "#8b5cf6", "#10b981"][i], marginBottom: 8 }}>{phase.phase}</div>
-                {phase.items.map((item, j) => (
-                  <div key={j} style={{ fontSize: 14, color: "#94a3b8", padding: "4px 0", paddingLeft: 16, borderLeft: "2px solid #334155", marginLeft: 8, marginBottom: 4 }}>{item}</div>
-                ))}
+              <div key={i} style={{ padding: 16, borderRadius: 12, background: "#0f172a", marginBottom: 12, borderLeft: "4px solid " + ["#60a5fa", "#a78bfa", "#34d399"][i] }}>
+                <div style={{ fontWeight: 700, color: ["#60a5fa", "#a78bfa", "#34d399"][i], marginBottom: 8, fontSize: 15 }}>{phase.phase}</div>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {phase.items.map((item, j) => (
+                    <li key={j} style={{ fontSize: 14, color: "#cbd5e1", padding: "4px 0", paddingLeft: 16, borderLeft: "2px solid #475569", marginLeft: 8, marginBottom: 4 }}>{item}</li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         <div style={{ textAlign: "center", margin: "32px 0", display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={() => setViewMode("assessment")} style={s.btnSecondary}>← Back to Assessment</button>
@@ -392,7 +632,6 @@ function ReadinessAssessment() {
       </div>
     );
   }
-
   return (
     <div>
       <div style={s.hero}>
@@ -401,16 +640,16 @@ function ReadinessAssessment() {
       </div>
 
       {/* Institution Info */}
-      <div style={s.card}>
-        <h3 style={s.cardTitle}>📋 Institution Profile</h3>
+      <section style={s.card} aria-labelledby="profile-heading">
+        <h3 id="profile-heading" style={s.cardTitle}>📋 Institution Profile</h3>
         <div style={s.grid2}>
           <div>
-            <label style={s.label}>Institution Name</label>
-            <input style={s.input} placeholder="e.g., University of the West Indies" value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} />
+            <label htmlFor="inst-name" style={s.label}>Institution Name</label>
+            <input id="inst-name" style={s.input} placeholder="e.g., University of the West Indies" value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} />
           </div>
           <div>
-            <label style={s.label}>Sector</label>
-            <select style={s.input} value={sector} onChange={(e) => setSector(e.target.value)}>
+            <label htmlFor="inst-sector" style={s.label}>Sector</label>
+            <select id="inst-sector" style={s.input} value={sector} onChange={(e) => setSector(e.target.value)}>
               <option value="">Select sector...</option>
               <option value="Higher Education">Higher Education</option>
               <option value="K-12 Education">K-12 Education</option>
@@ -422,27 +661,50 @@ function ReadinessAssessment() {
             </select>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Progress */}
       <div style={s.card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <span style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 14 }}>Progress: {answeredQuestions}/{totalQuestions} questions</span>
-          <span style={{ fontWeight: 700, color: "#3b82f6" }}>{progress}%</span>
+          <span style={{ fontWeight: 700, color: "#60a5fa" }}>{progress}%</span>
         </div>
-        <div style={s.progressBar(0, "")}>
-          <div style={s.progressFill(progress, "#3b82f6")} />
+        <div style={s.progressBar()} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={"Assessment progress: " + progress + "% complete, " + answeredQuestions + " of " + totalQuestions + " questions answered"}>
+          <div style={s.progressFill(progress, "#60a5fa")} />
         </div>
       </div>
 
       {/* Dimension Navigation */}
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 20, padding: "4px 0" }}>
+      <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 20, padding: "4px 0" }} role="tablist" aria-label="Assessment dimensions">
         {ASSESSMENT_DIMENSIONS.map((dim, i) => {
           const answered = dim.questions.filter((_, j) => scores[dim.key + "_" + j] > 0).length;
           return (
-            <button key={dim.key} onClick={() => setCurrentDim(i)} style={{ flexShrink: 0, padding: "10px 16px", borderRadius: 10, border: "2px solid " + (currentDim === i ? dim.color : "#334155"), background: currentDim === i ? dim.color + "15" : "transparent", color: currentDim === i ? dim.color : "#94a3b8", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6 }}>
-              {dim.icon} {dim.label}
-              {answered === dim.questions.length && <span style={{ color: "#10b981" }}>✓</span>}
+            <button
+              key={dim.key}
+              role="tab"
+              aria-selected={currentDim === i}
+              aria-controls={"dim-panel-" + dim.key}
+              id={"dim-tab-" + dim.key}
+              onClick={() => setCurrentDim(i)}
+              style={{
+                flexShrink: 0,
+                padding: "10px 16px",
+                borderRadius: 10,
+                border: "2px solid " + (currentDim === i ? dim.color : "#475569"),
+                background: currentDim === i ? dim.color + "20" : "transparent",
+                color: currentDim === i ? dim.color : "#cbd5e1",
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: "pointer",
+                fontFamily: "Inter, sans-serif",
+                transition: "all 0.2s",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <span aria-hidden="true">{dim.icon}</span> {dim.label}
+              {answered === dim.questions.length && <span style={{ color: "#34d399" }} aria-label="(complete)">✓</span>}
             </button>
           );
         })}
@@ -452,80 +714,137 @@ function ReadinessAssessment() {
       {(() => {
         const dim = ASSESSMENT_DIMENSIONS[currentDim];
         return (
-          <div style={{ ...s.card, borderColor: dim.color + "40" }}>
-            <h3 style={{ ...s.cardTitle, color: dim.color }}>{dim.icon} {dim.label}</h3>
+          <section
+            id={"dim-panel-" + dim.key}
+            role="tabpanel"
+            aria-labelledby={"dim-tab-" + dim.key}
+            style={{ ...s.card, borderColor: dim.color + "50" }}
+          >
+            <h3 style={{ ...s.cardTitle, color: dim.color }}>
+              <span aria-hidden="true">{dim.icon}</span> {dim.label}
+            </h3>
             <div style={{ marginTop: 16 }}>
-              {dim.questions.map((q, qi) => (
-                <div key={qi} style={{ marginBottom: 24, padding: 16, borderRadius: 12, background: "#0f172a" }}>
-                  <p style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 15, marginBottom: 12 }}>{qi + 1}. {q}</p>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    {SCORE_OPTIONS.map((opt) => (
-                      <button key={opt.value} onClick={() => setScore(dim.key, qi, opt.value)} style={{ padding: "8px 16px", borderRadius: 8, border: "2px solid " + (scores[dim.key + "_" + qi] === opt.value ? opt.color : "#334155"), background: scores[dim.key + "_" + qi] === opt.value ? opt.color + "20" : "transparent", color: scores[dim.key + "_" + qi] === opt.value ? opt.color : "#94a3b8", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.15s" }}>
-                        {opt.value}. {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              {dim.questions.map((q, qi) => {
+                const currentScore = scores[dim.key + "_" + qi];
+                return (
+                  <fieldset key={qi} style={{ marginBottom: 24, padding: 16, borderRadius: 12, background: "#0f172a", border: "none" }}>
+                    <legend style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 15, marginBottom: 12 }}>{qi + 1}. {q}</legend>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} role="radiogroup" aria-label={q}>
+                      {SCORE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          role="radio"
+                          aria-checked={currentScore === opt.value}
+                          onClick={() => setScore(dim.key, qi, opt.value)}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: 8,
+                            border: "2px solid " + (currentScore === opt.value ? opt.color : "#475569"),
+                            background: currentScore === opt.value ? opt.color + "25" : "transparent",
+                            color: currentScore === opt.value ? opt.color : "#cbd5e1",
+                            fontWeight: 600,
+                            fontSize: 13,
+                            cursor: "pointer",
+                            fontFamily: "Inter, sans-serif",
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          {opt.value}. {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                );
+              })}
             </div>
 
             {/* Navigation */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
-              <button onClick={() => setCurrentDim(Math.max(0, currentDim - 1))} disabled={currentDim === 0} style={{ ...s.btnSecondary, opacity: currentDim === 0 ? 0.4 : 1 }}>← Previous</button>
+              <button
+                onClick={() => setCurrentDim(Math.max(0, currentDim - 1))}
+                disabled={currentDim === 0}
+                style={{ ...s.btnSecondary, opacity: currentDim === 0 ? 0.4 : 1 }}
+                aria-label="Go to previous dimension"
+              >
+                ← Previous
+              </button>
               {currentDim < ASSESSMENT_DIMENSIONS.length - 1 ? (
-                <button onClick={() => setCurrentDim(currentDim + 1)} style={s.btnPrimary}>Next →</button>
+                <button onClick={() => setCurrentDim(currentDim + 1)} style={s.btnPrimary} aria-label="Go to next dimension">
+                  Next →
+                </button>
               ) : (
-                <button onClick={generateReport} style={s.btnSuccess} disabled={answeredQuestions === 0}>📊 Generate Report</button>
+                <button onClick={generateReport} style={{ ...s.btnSuccess, opacity: answeredQuestions === 0 ? 0.5 : 1 }} disabled={answeredQuestions === 0} aria-label="Generate your AI readiness report">
+                  📊 Generate Report
+                </button>
               )}
             </div>
-          </div>
+          </section>
         );
       })()}
     </div>
   );
 }
-
 /* ─── MAIN APP ─── */
 export default function CareCartApp() {
   const [activeTab, setActiveTab] = useState("prompt");
 
   useEffect(() => {
     const style = document.createElement("style");
-    style.textContent = "@media print { body { background: white !important; color: black !important; } button, nav { display: none !important; } } @media (max-width: 640px) { .nav-text { display: none; } }";
+    style.textContent = ACCESSIBILITY_CSS;
     document.head.appendChild(style);
     return () => style.remove();
   }, []);
 
   return (
     <div style={s.app}>
+      {/* Skip Navigation */}
+      <a href="#main-content" className="skip-link" style={s.skipLink}>Skip to main content</a>
+
       {/* Header */}
       <header style={s.header}>
         <div style={s.headerInner}>
           <div style={s.logo}>
-            <div style={s.logoIcon}>CC</div>
+            <div style={s.logoIcon} aria-hidden="true">CC</div>
             <div>
               <div style={s.logoText}>CareCart</div>
               <div style={s.logoSub}>AI Toolkit</div>
             </div>
           </div>
-          <nav style={s.nav}>
-            <button style={s.navBtn(activeTab === "prompt")} onClick={() => setActiveTab("prompt")}>🛒 Prompt Builder</button>
-            <button style={s.navBtn(activeTab === "assess")} onClick={() => setActiveTab("assess")}>🏛️ AI Readiness</button>
+          <nav style={s.nav} role="tablist" aria-label="Main navigation">
+            <button
+              role="tab"
+              aria-selected={activeTab === "prompt"}
+              aria-controls="tab-prompt"
+              style={s.navBtn(activeTab === "prompt")}
+              onClick={() => setActiveTab("prompt")}
+            >
+              🛒 Prompt Builder
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === "assess"}
+              aria-controls="tab-assess"
+              style={s.navBtn(activeTab === "assess")}
+              onClick={() => setActiveTab("assess")}
+            >
+              🏛️ AI Readiness
+            </button>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main style={s.main}>
-        {activeTab === "prompt" && <PromptBuilder />}
-        {activeTab === "assess" && <ReadinessAssessment />}
+      <main id="main-content" style={s.main} role="tabpanel">
+        {activeTab === "prompt" && <div id="tab-prompt"><PromptBuilder /></div>}
+        {activeTab === "assess" && <div id="tab-assess"><ReadinessAssessment /></div>}
       </main>
 
       {/* Footer */}
-      <footer style={{ textAlign: "center", padding: "24px", borderTop: "1px solid #334155", color: "#64748b", fontSize: 13 }}>
+      <footer style={{ textAlign: "center", padding: "24px", borderTop: "1px solid #475569", color: "#94a3b8", fontSize: 14 }}>
         <p>CareCart AI Toolkit — Powered by CARE & CRAFT Frameworks</p>
         <p style={{ marginTop: 4 }}>Built for educators, institutions, and change-makers across the Caribbean and beyond.</p>
       </footer>
     </div>
   );
 }
+
