@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
 
-/* ─── CONSTANTS ─── */
+/* --- CONSTANTS --- */
 const CARE_STEPS = [
   { key: "consider", label: "Consider", icon: "🔍", color: "#60a5fa", description: "What is the task? Who is the audience? What tools are available?" },
   { key: "analyze", label: "Analyze", icon: "📊", color: "#a78bfa", description: "What information do you need? What are the constraints? What format works best?" },
@@ -25,7 +25,6 @@ const PROMPT_CATEGORIES = [
   { id: "health", label: "Health & Wellness", icon: "🏥", examples: ["Patient communication", "Health education material", "Wellness program design"] },
   { id: "technology", label: "Technology & IT", icon: "💻", examples: ["Technical documentation", "User guide", "Implementation plan"] },
 ];
-
 const ASSESSMENT_DIMENSIONS = [
   {
     key: "leadership",
@@ -141,8 +140,7 @@ function getReadinessLevel(score) {
   return { level: "Beginning", color: "#fb7185", emoji: "🏁", desc: "Just starting the journey. Begin with awareness-building and strategic planning." };
 }
 
-/* ─── STYLES ─── */
-const s = {
+/* --- STYLES --- */ const s = {
   app: { minHeight: "100vh", background: "#0f172a" },
   skipLink: { position: "absolute", top: -40, left: 0, background: "#3b82f6", color: "white", padding: "8px 16px", zIndex: 200, fontSize: 14, fontWeight: 600, textDecoration: "none", borderRadius: "0 0 8px 0", transition: "top 0.2s" },
   skipLinkFocus: { top: 0 },
@@ -170,16 +168,17 @@ const s = {
   btnSuccess: { padding: "14px 28px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" },
   grid2: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 },
   grid3: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 },
-  tag: (color) => ({ display: "inline-block", padding: "4px 12px", borderRadius: 20, background: color + "25", color: color, fontSize: 12, fontWeight: 700, border: "1px solid " + color + "40" }),
+  tag: (color) => ({ display: "inline-block", padding: "4px 12px", borderRadius: 20, background: `${color}25`, color: color, fontSize: 12, fontWeight: 700, border: `1px solid ` + color + `40` }),
   progressBar: () => ({ height: 10, borderRadius: 5, background: "#1e293b", overflow: "hidden", position: "relative", border: "1px solid #475569" }),
-  progressFill: (pct, color) => ({ height: "100%", width: pct + "%", borderRadius: 5, background: color, transition: "width 0.5s ease" }),
-  badge: (color) => ({ width: 48, height: 48, borderRadius: 12, background: color + "25", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, border: "1px solid " + color + "40" }),
+  progressFill: (pct, color) => ({ height: "100%", width: `${pct}%`, borderRadius: 5, background: color, transition: "width 0.5s ease" }),
+  badge: (color) => ({ width: 48, height: 48, borderRadius: 12, background: `${color}25`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0, border: `1px solid ` + color + `40` }),
   outputBox: { background: "#0f172a", borderRadius: 12, border: "2px solid #475569", padding: 20, fontFamily: "monospace", fontSize: 14, lineHeight: 1.8, color: "#e2e8f0", whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: 500, overflowY: "auto" },
   copyBtn: { position: "absolute", top: 12, right: 12, padding: "8px 16px", borderRadius: 8, border: "2px solid #475569", background: "#1e293b", color: "#cbd5e1", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif" },
 };
 
-/* ─── FOCUS STYLES CSS (injected) ─── */
-const ACCESSIBILITY_CSS = `  /* Skip link */
+/* --- FOCUS STYLES CSS (injected) --- */
+const ACCESSIBILITY_CSS = `
+  /* Skip link */
   .skip-link:focus { top: 0 !important; }
 
   /* Focus visible for all interactive elements */
@@ -267,7 +266,8 @@ const ACCESSIBILITY_CSS = `  /* Skip link */
     border-width: 0;
   }
 `;
-/* ─── PROMPT BUILDER ─── */
+
+/* --- PROMPT BUILDER --- */
 function PromptBuilder() {
   const [category, setCategory] = useState(null);
   const [craftInputs, setCraftInputs] = useState({ context: "", role: "", action: "", format: "", threshold: "" });
@@ -282,19 +282,27 @@ function PromptBuilder() {
 
   const generatePrompt = () => {
     const parts = [];
-    if (craftInputs.context) parts.push("**Context:** " + craftInputs.context);
-    if (craftInputs.role) parts.push("**Role:** " + craftInputs.role);
-    if (craftInputs.action) parts.push("**Task:** " + craftInputs.action);
-    if (craftInputs.format) parts.push("**Format:** " + craftInputs.format);
-    if (craftInputs.threshold) parts.push("**Quality Standards:** " + craftInputs.threshold);
+    if (craftInputs.context) parts.push(`**Context:** ${craftInputs.context}`);
+    if (craftInputs.role) parts.push(`**Role:** ${craftInputs.role}`);
+    if (craftInputs.action) parts.push(`**Task:** ${craftInputs.action}`);
+    if (craftInputs.format) parts.push(`**Format:** ${craftInputs.format}`);
+    if (craftInputs.threshold) parts.push(`**Quality Standards:** ${craftInputs.threshold}`);
 
-    let prompt = parts.join("\n\n");
+    let prompt = parts.join("
+
+");
 
     if (careNotes.consider || careNotes.analyze || careNotes.reflect) {
-      prompt += "\n\n---\n**Additional Notes:**";
-      if (careNotes.consider) prompt += "\n- Considerations: " + careNotes.consider;
-      if (careNotes.analyze) prompt += "\n- Analysis: " + careNotes.analyze;
-      if (careNotes.reflect) prompt += "\n- Reflections: " + careNotes.reflect;
+      prompt += "
+
+---
+**Additional Notes:**";
+      if (careNotes.consider) prompt += `
+- Considerations: ${careNotes.consider}`;
+      if (careNotes.analyze) prompt += `
+- Analysis: ${careNotes.analyze}`;
+      if (careNotes.reflect) prompt += `
+- Reflections: ${careNotes.reflect}`;
     }
 
     setGenerated(prompt);
@@ -348,8 +356,8 @@ function PromptBuilder() {
               style={{
                 padding: 16,
                 borderRadius: 12,
-                border: "2px solid " + (category === cat.id ? "#60a5fa" : "#475569"),
-                background: category === cat.id ? "rgba(59,130,246,0.15)" : "#0f172a",
+                border: `2px solid ${category === cat.id ? "#60a5fa" : "#475569"}`,
+                background: `${category === cat.id ? "rgba(59,130,246,0.15)" : "#0f172a"}`,
                 cursor: "pointer",
                 transition: "all 0.2s",
               }}
@@ -367,14 +375,14 @@ function PromptBuilder() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
           <h3 id="craft-heading" style={s.cardTitle}>
             ✨ CRAFT Your Prompt
-            <span style={s.tag("#60a5fa")} aria-label={filledCount + " of 5 fields filled"}>{filledCount}/5 fields</span>
+            <span style={s.tag("#60a5fa")} aria-label=`${filledCount} of 5 fields filled`}>{filledCount}/5 fields</span>
           </h3>
           <button onClick={resetAll} style={s.btnSecondary} aria-label="Reset all prompt fields">Reset All</button>
         </div>
 
         {CRAFT_FIELDS.map((field, i) => {
-          const fieldId = "craft-" + field.key;
-          const hintId = "craft-" + field.key + "-hint";
+          const fieldId = `craft-${field.key}`;
+          const hintId = `craft-${field.key}-hint`;
           return (
             <div key={field.key} style={{ marginBottom: 20 }}>
               <label htmlFor={fieldId} style={s.label}>
@@ -413,9 +421,9 @@ function PromptBuilder() {
           <div id="care-panel" style={{ marginTop: 20 }}>
             <div style={s.grid2}>
               {CARE_STEPS.map((step) => {
-                const noteId = "care-" + step.key;
+                const noteId = `care-${step.key}`;
                 return (
-                  <div key={step.key} style={{ padding: 16, borderRadius: 12, border: "1px solid " + step.color + "40", background: step.color + "10" }}>
+                  <div key={step.key} style={{ padding: 16, borderRadius: 12, border: `1px solid ${step.color}40`, background: `${step.color}10` }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <span style={s.badge(step.color)} aria-hidden="true">{step.icon}</span>
                       <div>
@@ -426,8 +434,8 @@ function PromptBuilder() {
                     <label htmlFor={noteId} className="sr-only">{step.label} notes</label>
                     <textarea
                       id={noteId}
-                      style={{ ...s.textarea, minHeight: 70, borderColor: step.color + "40" }}
-                      placeholder={"Your " + step.label.toLowerCase() + " notes..."}
+                      style={{ ...s.textarea, minHeight: 70, borderColor: `${step.color}40` }}
+                      placeholder=`Your ${step.label.toLowerCase()} notes...`
                       value={careNotes[step.key]}
                       onChange={(e) => updateCare(step.key, e.target.value)}
                       rows={2}
@@ -468,8 +476,9 @@ function PromptBuilder() {
       )}
     </div>
   );
-}
-/* ─── AI READINESS ASSESSMENT ─── */
+      }
+
+/* --- AI READINESS ASSESSMENT --- */
 function ReadinessAssessment() {
   const [institutionName, setInstitutionName] = useState("");
   const [sector, setSector] = useState("");
@@ -481,13 +490,13 @@ function ReadinessAssessment() {
   const setScore = (dimKey, qIdx, value) => {
     setScores((p) => ({
       ...p,
-      [dimKey + "_" + qIdx]: value,
+      [`${dimKey}_${qIdx}`]: value,
     }));
   };
 
   const getDimScore = (dimKey) => {
     const dim = ASSESSMENT_DIMENSIONS.find((d) => d.key === dimKey);
-    const vals = dim.questions.map((_, i) => scores[dimKey + "_" + i] || 0);
+    const vals = dim.questions.map((_, i) => scores[`${dimKey}_${i}`] || 0);
     const filled = vals.filter((v) => v > 0);
     return filled.length > 0 ? filled.reduce((a, b) => a + b, 0) / filled.length : 0;
   };
@@ -531,13 +540,13 @@ function ReadinessAssessment() {
       <div role="region" aria-label="AI Readiness Assessment Results">
         <div style={s.hero}>
           <h2 style={s.heroTitle}>📊 AI Readiness Report</h2>
-          <p style={s.heroSub}>{institutionName || "Your Institution"} {sector ? "• " + sector : ""}</p>
+          <p style={s.heroSub}>{institutionName || "Your Institution"} {sector ? `• ${sector}` : ""}</p>
         </div>
 
         {/* Overall Score */}
-        <section style={{ ...s.card, textAlign: "center", borderColor: readiness.color, background: "linear-gradient(135deg, " + readiness.color + "10, " + readiness.color + "05)" }} aria-label="Overall readiness score">
+        <section style={{ ...s.card, textAlign: "center", borderColor: readiness.color, background: `linear-gradient(135deg, ${readiness.color}10, ${readiness.color}05)` }} aria-label="Overall readiness score">
           <div style={{ fontSize: 64, marginBottom: 8 }} aria-hidden="true">{readiness.emoji}</div>
-          <div style={{ fontSize: 48, fontWeight: 800, color: readiness.color }} aria-label={"Overall score: " + overall.toFixed(1) + " out of 5"}>
+          <div style={{ fontSize: 48, fontWeight: 800, color: readiness.color }} aria-label=`Overall score: ${overall.toFixed(1)} out of 5`}>
             {overall.toFixed(1)}<span style={{ fontSize: 24, color: "#94a3b8" }}>/5.0</span>
           </div>
           <div style={{ fontSize: 24, fontWeight: 700, color: readiness.color, marginBottom: 8 }}>{readiness.level}</div>
@@ -547,8 +556,7 @@ function ReadinessAssessment() {
         {/* Dimension Scores */}
         <section style={s.card} aria-labelledby="dim-scores-heading">
           <h3 id="dim-scores-heading" style={s.cardTitle}>📈 Dimension Scores</h3>
-          <div style={{ marginTop: 16 }}>
-            {ASSESSMENT_DIMENSIONS.map((dim) => {
+          <div style={{ marginTop: 16 }}>{ASSESSMENT_DIMENSIONS.map((dim) => {
               const dimScore = getDimScore(dim.key);
               const dimLevel = getReadinessLevel(dimScore);
               return (
@@ -563,7 +571,7 @@ function ReadinessAssessment() {
                       <span style={{ fontWeight: 700, color: dimLevel.color }}>{dimScore.toFixed(1)}</span>
                     </div>
                   </div>
-                  <div style={s.progressBar()} role="progressbar" aria-valuenow={Math.round(dimScore * 20)} aria-valuemin={0} aria-valuemax={100} aria-label={dim.label + ": " + dimScore.toFixed(1) + " out of 5"}>
+                  <div style={s.progressBar()} role="progressbar" aria-valuenow={Math.round(dimScore * 20)} aria-valuemin={0} aria-valuemax={100} aria-label=`${dim.label}: ${dimScore.toFixed(1)} out of 5`}>
                     <div style={s.progressFill((dimScore / 5) * 100, dim.color)} />
                   </div>
                 </div>
@@ -612,8 +620,8 @@ function ReadinessAssessment() {
               { phase: "Foundation Building (3-6 months)", items: ["Launch AI literacy training for all staff", "Identify 2-3 pilot AI projects", "Develop data governance framework"] },
               { phase: "Scale & Optimize (6-12 months)", items: ["Expand successful pilots institution-wide", "Build strategic vendor partnerships", "Create ongoing AI skills development program"] },
             ].map((phase, i) => (
-              <div key={i} style={{ padding: 16, borderRadius: 12, background: "#0f172a", marginBottom: 12, borderLeft: "4px solid " + ["#60a5fa", "#a78bfa", "#34d399"][i] }}>
-                <div style={{ fontWeight: 700, color: ["#60a5fa", "#a78bfa", "#34d399"][i], marginBottom: 8, fontSize: 15 }}>{phase.phase}</div>
+              <div key={i} style={{ padding: 16, borderRadius: 12, background: "#0f172a", marginBottom: 12, borderLeft: `4px solid ${["#60a5fa", "#a78bfa", "#34d399"][i]}` }}>
+                <div style={{ fontWeight: 700, color: `${["#60a5fa", "#a78bfa", "#34d399"][i]}`, marginBottom: 8, fontSize: 15 }}>{phase.phase}</div>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                   {phase.items.map((item, j) => (
                     <li key={j} style={{ fontSize: 14, color: "#cbd5e1", padding: "4px 0", paddingLeft: 16, borderLeft: "2px solid #475569", marginLeft: 8, marginBottom: 4 }}>{item}</li>
@@ -631,7 +639,8 @@ function ReadinessAssessment() {
         </div>
       </div>
     );
-  }
+      }
+
   return (
     <div>
       <div style={s.hero}>
@@ -669,7 +678,7 @@ function ReadinessAssessment() {
           <span style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 14 }}>Progress: {answeredQuestions}/{totalQuestions} questions</span>
           <span style={{ fontWeight: 700, color: "#60a5fa" }}>{progress}%</span>
         </div>
-        <div style={s.progressBar()} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={"Assessment progress: " + progress + "% complete, " + answeredQuestions + " of " + totalQuestions + " questions answered"}>
+        <div style={s.progressBar()} role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label=`Assessment progress: ${progress}% complete, ${answeredQuestions} of ${totalQuestions} questions answered`}>
           <div style={s.progressFill(progress, "#60a5fa")} />
         </div>
       </div>
@@ -677,22 +686,22 @@ function ReadinessAssessment() {
       {/* Dimension Navigation */}
       <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 20, padding: "4px 0" }} role="tablist" aria-label="Assessment dimensions">
         {ASSESSMENT_DIMENSIONS.map((dim, i) => {
-          const answered = dim.questions.filter((_, j) => scores[dim.key + "_" + j] > 0).length;
+          const answered = dim.questions.filter((_, j) => scores[`${dim.key}_${j}`] > 0).length;
           return (
             <button
               key={dim.key}
               role="tab"
               aria-selected={currentDim === i}
-              aria-controls={"dim-panel-" + dim.key}
-              id={"dim-tab-" + dim.key}
+              aria-controls={`dim-panel-${dim.key}`}
+              id={`dim-tab-${dim.key}`}
               onClick={() => setCurrentDim(i)}
               style={{
                 flexShrink: 0,
                 padding: "10px 16px",
                 borderRadius: 10,
-                border: "2px solid " + (currentDim === i ? dim.color : "#475569"),
-                background: currentDim === i ? dim.color + "20" : "transparent",
-                color: currentDim === i ? dim.color : "#cbd5e1",
+                border: `2px solid ${currentDim === i ? dim.color : "#475569"}`,
+                background: `${currentDim === i ? `${dim.color}20` : "transparent"}`,
+                color: `${currentDim === i ? dim.color : "#cbd5e1"}`,
                 fontWeight: 600,
                 fontSize: 13,
                 cursor: "pointer",
@@ -715,17 +724,17 @@ function ReadinessAssessment() {
         const dim = ASSESSMENT_DIMENSIONS[currentDim];
         return (
           <section
-            id={"dim-panel-" + dim.key}
+            id={`dim-panel-${dim.key}`}
             role="tabpanel"
-            aria-labelledby={"dim-tab-" + dim.key}
-            style={{ ...s.card, borderColor: dim.color + "50" }}
+            aria-labelledby={`dim-tab-${dim.key}`}
+            style={{ ...s.card, borderColor: `${dim.color}50` }}
           >
             <h3 style={{ ...s.cardTitle, color: dim.color }}>
               <span aria-hidden="true">{dim.icon}</span> {dim.label}
             </h3>
             <div style={{ marginTop: 16 }}>
               {dim.questions.map((q, qi) => {
-                const currentScore = scores[dim.key + "_" + qi];
+                const currentScore = scores[`${dim.key}_${qi}`];
                 return (
                   <fieldset key={qi} style={{ marginBottom: 24, padding: 16, borderRadius: 12, background: "#0f172a", border: "none" }}>
                     <legend style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 15, marginBottom: 12 }}>{qi + 1}. {q}</legend>
@@ -739,9 +748,9 @@ function ReadinessAssessment() {
                           style={{
                             padding: "8px 16px",
                             borderRadius: 8,
-                            border: "2px solid " + (currentScore === opt.value ? opt.color : "#475569"),
-                            background: currentScore === opt.value ? opt.color + "25" : "transparent",
-                            color: currentScore === opt.value ? opt.color : "#cbd5e1",
+                            border: `2px solid ${currentScore === opt.value ? opt.color : "#475569"}`,
+                            background: `${currentScore === opt.value ? `${opt.color}25` : "transparent"}`,
+                            color: `${currentScore === opt.value ? opt.color : "#cbd5e1"}`,
                             fontWeight: 600,
                             fontSize: 13,
                             cursor: "pointer",
@@ -784,7 +793,8 @@ function ReadinessAssessment() {
     </div>
   );
 }
-/* ─── MAIN APP ─── */
+
+/* --- MAIN APP --- */
 export default function CareCartApp() {
   const [activeTab, setActiveTab] = useState("prompt");
 
@@ -843,8 +853,8 @@ export default function CareCartApp() {
       <footer style={{ textAlign: "center", padding: "24px", borderTop: "1px solid #475569", color: "#94a3b8", fontSize: 14 }}>
         <p>CareCart AI Toolkit — Powered by CARE & CRAFT Frameworks</p>
         <p style={{ marginTop: 4 }}>Built for educators, institutions, and change-makers across the Caribbean and beyond.</p>
+        <p style={{ marginTop: 8, fontSize: 13, color: "#cbd5e1" }}>Designed by <strong style={{ color: "#f8fafc" }}>Dr. Rohan Jowallah</strong></p>
       </footer>
     </div>
   );
 }
-
