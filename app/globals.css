@@ -1,0 +1,18 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-primary: #0f172a; --bg-secondary: #1e293b; --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8; --border: #334155; --accent-blue: #3b82f6;
+}
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary); color: var(--text-primary);
+  line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+html { scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; border-radius: 4px; }
+::selection { background: rgba(59,130,246,0.3); color: white; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+@media print { body { background: white; color: black; } }
